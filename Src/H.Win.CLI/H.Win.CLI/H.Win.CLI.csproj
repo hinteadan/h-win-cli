@@ -17,25 +17,79 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="exportedLogRecords%281%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(1).data.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords%282%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(1).JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords%283%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(10).JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords%284%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(11).JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords%285%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(12).JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords%286%29.data.json">
+	  <None Update="StaticData\exportedLogRecords(13).JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="exportedLogRecords.data.json">
+	  <None Update="StaticData\exportedLogRecords(14).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(15).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(16).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(17).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(2).data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(2).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(3).data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(3).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(4).data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(4).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(5).data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(5).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(6).data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(6).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(7).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(8).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords(9).JSON">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords.data.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="StaticData\exportedLogRecords.JSON">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

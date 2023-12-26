@@ -1,7 +1,10 @@
 using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
+using H.Necessaire.Serialization;
 using System;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using WindowsFirewallHelper;
 
@@ -23,6 +26,23 @@ namespace H.Win.CLI.Commands
             {
                 await Task.Delay(TimeSpan.Zero);
 
+                DirectoryInfo folder = new DirectoryInfo(".");
+                FileInfo[] dataFiles =  folder.GetFiles("*.data.json");
+
+                string[] rawJsons = dataFiles.Select(x => File.ReadAllText(x.FullName)).ToArray();
+
+                RawDataFileEntry[] dataEntries = rawJsons.SelectMany(x => x.JsonToObject<RawDataFileEntry[]>()).ToArray();
+
+                var ips
+                    = dataEntries
+                    .Select(x => x.IPAddress)
+                    .GroupBy(x => x)
+                    .Select(x => new { IP = x.Key, Count = x.Count() })
+                    .OrderBy(x => x.IP)
+                    .ThenByDescending(x => x.Count)
+                    .ToArray()
+                    ;
+
 
 
                 //IFirewallRule[] rules
@@ -33,6 +53,12 @@ namespace H.Win.CLI.Commands
             }
 
             return OperationResult.Win();
+        }
+
+        [DataContract]
+        class RawDataFileEntry
+        {
+            [DataMember(Name = "newrelic.IP")] public string IPAddress { get; set; }
         }
     }
 }

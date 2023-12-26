@@ -26,8 +26,8 @@ namespace H.Win.CLI.Commands
             {
                 await Task.Delay(TimeSpan.Zero);
 
-                DirectoryInfo folder = new DirectoryInfo(".");
-                FileInfo[] dataFiles =  folder.GetFiles("*.data.json");
+                DirectoryInfo folder = new DirectoryInfo("StaticData");
+                FileInfo[] dataFiles =  folder.GetFiles("*.json");
 
                 string[] rawJsons = dataFiles.Select(x => File.ReadAllText(x.FullName)).ToArray();
 

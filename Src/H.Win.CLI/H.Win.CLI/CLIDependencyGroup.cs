@@ -1,4 +1,5 @@
 using H.Necessaire;
+using WindowsFirewallHelper;
 
 namespace H.Win.CLI
 {
@@ -6,11 +7,9 @@ namespace H.Win.CLI
     {
         public void RegisterDependencies(ImADependencyRegistry dependencyRegistry)
         {
-            /*
             dependencyRegistry
-                .Register<Logging.DependencyGroup>(() => new Logging.DependencyGroup())
+                .Register<IFirewall>(() => FirewallManager.Instance)
                 ;
-            */
         }
     }
 }

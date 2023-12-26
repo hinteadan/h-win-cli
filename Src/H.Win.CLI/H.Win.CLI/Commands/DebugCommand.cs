@@ -36,10 +36,10 @@ namespace H.Win.CLI.Commands
                 var ips
                     = dataEntries
                     .Select(x => x.IPAddress)
-                    .GroupBy(x => x)
-                    .Select(x => new { IP = x.Key, Count = x.Count() })
-                    .OrderBy(x => x.IP)
-                    .ThenByDescending(x => x.Count)
+                    .GroupBy(x => x.Substring(0, x.LastIndexOf(".")) + ".*")
+                    .Select(x => new { IPGroup = x.Key, IPs = x.Select(x => x).Distinct().Order().ToArray(), Count = x.Count() })
+                    .OrderByDescending(x => x.IPs.Length)
+                    .ThenBy(x => x.IPGroup)
                     .ToArray()
                     ;
 

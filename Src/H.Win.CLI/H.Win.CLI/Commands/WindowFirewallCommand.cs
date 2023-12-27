@@ -1,6 +1,8 @@
 ﻿using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
+using H.Win.CLI.BLL;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WindowsFirewallHelper;
@@ -44,12 +46,16 @@ namespace H.Win.CLI.Commands
             await
                 new Func<Task>(async () =>
                 {
-                    IFirewallRule[] rulesWithBlockingIPs
+                    FirewallBlockedAddressInfo[] blockedAddresses
                         = firewall
                         .Rules
-                        .Where(RuleHasBlockingIPs)
-                        .Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Inbound))
-                        .ToNoNullsArray();
+                        .Where(x => x.HasBlockingAddresses())
+                        .Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Outbound))
+                        .SelectMany(rule => rule.AggregateBlockedAddressInfos() ?? Array.Empty<FirewallBlockedAddressInfo>())
+                        .AggregateBulk()
+                        ?.OrderBy(x => x.ID)
+                        .ToArray()
+                        ;
 
                     result = OperationResult.Win();
                 })
@@ -58,48 +64,6 @@ namespace H.Win.CLI.Commands
                 );
 
             return result;
-        }
-
-        private bool RuleHasBlockingIPs(IFirewallRule rule)
-        {
-            if (rule == null)
-                return false;
-
-            if (rule.Action.NotIn(FirewallAction.Block))
-                return false;
-
-            bool hasLocalIPs = rule.LocalAddresses?.Any() == true;
-            bool hasRemoteIPs = rule.RemoteAddresses?.Any() == true;
-
-            if (!hasLocalIPs && !hasRemoteIPs)
-                return false;
-
-            return true;
-        }
-
-
-        class BlockedAddressInfo : IDentityType<IAddress>
-        {
-            public IAddress ID { get; set; }
-            public Type AddressType => ID?.GetType();
-            public string AddressTypeName => AddressType?.Name;
-            public ushort[] LocalPorts { get; set; }
-            public ushort[] RemotePorts { get; set; }
-            public IPType IPType { get; set; }
-            public IFirewallRule[] Rules { get; set; }
-            public string[] RuleFriendlyNames { get; set; }
-            public string[] RuleSystemNames { get; set; }
-            public string[] ApplicationNames { get; set; }
-            public string[] ServiceNames { get; set; }
-            public FirewallProfiles[] Profiles { get; set; }
-            public FirewallProtocol[] Protocols { get; set; }
-            public FirewallScope[] Scopes { get; set; }
-        }
-
-        enum IPType
-        {
-            Local = 0,
-            Remote = 17,
         }
     }
 }

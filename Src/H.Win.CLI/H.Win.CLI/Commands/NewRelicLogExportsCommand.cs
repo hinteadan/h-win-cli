@@ -49,23 +49,23 @@ namespace H.Win.CLI.Commands
                         return;
                     }
 
-                    FileParseResult[] parseResults
-                        = await Task.WhenAll(
-                            dataFiles.Select(async file =>
+                    FileParseResult[] parseResults = new FileParseResult[dataFiles.Length];
+                    int index = -1;
+                    foreach (FileInfo file in dataFiles)
+                    {
+                        index++;
+                        await Console.Out.WriteAsync(".");
+                        string rawJson = await file.OpenRead().ReadAsStringAsync(isStreamLeftOpen: false);
+                        await Console.Out.WriteAsync(".");
+                        OperationResult<RawDataFileEntry[]> parseResult = rawJson.TryJsonToObject<RawDataFileEntry[]>();
+                        await Console.Out.WriteAsync(".");
+                        parseResults[index] 
+                            = new FileParseResult
                             {
-                                await Console.Out.WriteAsync(".");
-                                string rawJson = await file.OpenRead().ReadAsStringAsync(isStreamLeftOpen: false);
-                                await Console.Out.WriteAsync(".");
-                                OperationResult<RawDataFileEntry[]> parseResult = rawJson.TryJsonToObject<RawDataFileEntry[]>();
-                                await Console.Out.WriteAsync(".");
-                                return
-                                    new FileParseResult
-                                    {
-                                        File = file,
-                                        ParseResult = parseResult,
-                                    };
-                            })
-                        );
+                                File = file,
+                                ParseResult = parseResult,
+                            };
+                    }
 
                     FileParseResult[] parseFailures = parseResults.Where(x => !x.ParseResult.IsSuccessful).ToArrayNullIfEmpty();
                     if (parseFailures?.Any() == true)

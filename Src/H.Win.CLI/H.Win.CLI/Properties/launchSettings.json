@@ -6,7 +6,7 @@
     },
     "CLI - newrelic json log exports aggregate IPs": {
       "commandName": "Project",
-      "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" "
+      "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"ips.txt\""
     },
     "CLI - nugetversion - consolidate-deps": {
       "commandName": "Project",

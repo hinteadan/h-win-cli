@@ -14,7 +14,8 @@ namespace H.Win.CLI.Commands
     {
         static readonly string[] usageSyntaxes = new string[]
         {
-            "newrelic-log-exports IPs src=\"StaticData\""
+            "newrelic-log-exports IPs src=\"StaticData\"",
+            "newrelic-log-exports IPs src=\"StaticData\" out=\"ips.txt\"",
         };
         protected override string[] GetUsageSyntaxes() => usageSyntaxes;
 
@@ -52,8 +53,11 @@ namespace H.Win.CLI.Commands
                         = await Task.WhenAll(
                             dataFiles.Select(async file =>
                             {
+                                await Console.Out.WriteAsync(".");
                                 string rawJson = await file.OpenRead().ReadAsStringAsync(isStreamLeftOpen: false);
+                                await Console.Out.WriteAsync(".");
                                 OperationResult<RawDataFileEntry[]> parseResult = rawJson.TryJsonToObject<RawDataFileEntry[]>();
+                                await Console.Out.WriteAsync(".");
                                 return
                                     new FileParseResult
                                     {
@@ -85,6 +89,16 @@ namespace H.Win.CLI.Commands
 
                     await Console.Out.WriteLineAsync();
                     await Console.Out.WriteLineAsync(string.Join(Environment.NewLine, ips));
+
+                    string outPath = args?.Get("out");
+                    if (outPath.IsEmpty())
+                    {
+                        result = OperationResult.Win();
+                        return;
+                    }
+
+                    FileInfo outFile = new FileInfo(outPath);
+                    await File.WriteAllLinesAsync(outFile.FullName, ips);
 
                     result = OperationResult.Win();
                 })

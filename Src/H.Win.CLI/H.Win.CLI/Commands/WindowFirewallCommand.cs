@@ -44,20 +44,22 @@ namespace H.Win.CLI.Commands
             OperationResult result = OperationResult.Fail("Not yet started");
 
             await
-                new Func<Task>(async () =>
+                new Func<Task>(() =>
                 {
-                    FirewallBlockedAddressInfo[] blockedAddresses
+                    FirewallAddressInfo[] blockedAddresses
                         = firewall
                         .Rules
                         .Where(x => x.HasBlockingAddresses())
-                        .Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Inbound))
-                        .SelectMany(rule => rule.AggregateBlockedAddressInfos() ?? Array.Empty<FirewallBlockedAddressInfo>())
+                        //.Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Inbound))
+                        .SelectMany(rule => rule.AggregateBlockedAddressInfos() ?? Array.Empty<FirewallAddressInfo>())
                         .AggregateBulk()
                         ?.OrderBy(x => x.ID)
                         .ToArray()
                         ;
 
                     result = OperationResult.Win();
+
+                    return Task.CompletedTask;
                 })
                 .TryOrFailWithGrace(
                     onFail: ex => result = OperationResult.Fail(ex, $"Error occurred while trying to Aggregate And Print All Currently Blocked IPs In Windows Firewall. Message: {ex.Message}")

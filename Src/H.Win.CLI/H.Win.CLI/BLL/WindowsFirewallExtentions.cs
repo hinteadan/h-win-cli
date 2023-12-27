@@ -1,6 +1,6 @@
 ﻿using H.Necessaire;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using WindowsFirewallHelper;
 
@@ -8,12 +8,12 @@ namespace H.Win.CLI.BLL
 {
     public static class WindowsFirewallExtentions
     {
-        public static FirewallBlockedAddressInfo[] AggregateBlockedAddressInfos(this IFirewallRule firewallRule)
+        public static FirewallAddressInfo[] AggregateBlockedAddressInfos(this IFirewallRule firewallRule)
         {
             if (firewallRule.HasBlockingAddresses() != true)
                 return null;
 
-            List<FirewallBlockedAddressInfo> result = new List<FirewallBlockedAddressInfo>();
+            List<FirewallAddressInfo> result = new List<FirewallAddressInfo>();
 
             if (firewallRule.LocalAddresses?.Any() == true)
             {
@@ -36,9 +36,9 @@ namespace H.Win.CLI.BLL
             return result.ToNoNullsArray();
         }
 
-        
 
-        public static FirewallBlockedAddressInfo[] AggregateBulk(this IEnumerable<FirewallBlockedAddressInfo> allBulkBlockedAddressInfos)
+
+        public static FirewallAddressInfo[] AggregateBulk(this IEnumerable<FirewallAddressInfo> allBulkBlockedAddressInfos)
         {
             if (allBulkBlockedAddressInfos?.Any() != true)
                 return null;
@@ -67,7 +67,7 @@ namespace H.Win.CLI.BLL
             return true;
         }
 
-        private static FirewallBlockedAddressInfo BuildBlockedAddressInfo(IEnumerable<FirewallBlockedAddressInfo> group)
+        private static FirewallAddressInfo BuildBlockedAddressInfo(IEnumerable<FirewallAddressInfo> group)
         {
             if (group?.Any() != true)
                 return null;
@@ -77,26 +77,31 @@ namespace H.Win.CLI.BLL
             if (address == null)
                 return null;
 
-            return new FirewallBlockedAddressInfo
+            return new FirewallAddressInfo
             {
                 Address = address,
-                LocalPorts = group.SelectMany(x => x.LocalPorts ?? Array.Empty<ushort>()).Distinct().ToArrayNullIfEmpty(),
-                RemotePorts = group.SelectMany(x => x.RemotePorts ?? Array.Empty<ushort>()).Distinct().ToArrayNullIfEmpty(),
+                LocalPorts = group.SelectMany(x => x.LocalPorts ?? Array.Empty<ushort>()).Distinct().ToNoNullsArray(),
+                RemotePorts = group.SelectMany(x => x.RemotePorts ?? Array.Empty<ushort>()).Distinct().ToNoNullsArray(),
                 IPType = group.First().IPType,
-                Rules = group.SelectMany(x => x.Rules ?? Array.Empty<IFirewallRule>()).Distinct().ToArrayNullIfEmpty(),
-                RuleFriendlyNames = group.SelectMany(x => x.RuleFriendlyNames ?? Array.Empty<string>()).Distinct().ToArrayNullIfEmpty(),
-                RuleSystemNames = group.SelectMany(x => x.RuleSystemNames ?? Array.Empty<string>()).Distinct().ToArrayNullIfEmpty(),
-                Applications = group.SelectMany(x => x.Applications ?? Array.Empty<string>()).Distinct().ToArrayNullIfEmpty(),
-                Profiles = group.SelectMany(x => x.Profiles ?? Array.Empty<FirewallProfiles>()).Distinct().ToArrayNullIfEmpty(),
-                Protocols = group.SelectMany(x => x.Protocols ?? Array.Empty<FirewallProtocol>()).Distinct().ToArrayNullIfEmpty(),
-                Scopes = group.SelectMany(x => x.Scopes ?? Array.Empty<FirewallScope>()).Distinct().ToArrayNullIfEmpty(),
-                ServiceNames = group.SelectMany(x => x.ServiceNames ?? Array.Empty<string>()).Distinct().ToArrayNullIfEmpty(),
+                Rules = group.SelectMany(x => x.Rules ?? Array.Empty<IFirewallRule>()).Distinct().ToNoNullsArray(),
+                RuleFriendlyNames = group.SelectMany(x => x.RuleFriendlyNames ?? Array.Empty<string>()).Distinct().ToNoNullsArray(),
+                RuleSystemNames = group.SelectMany(x => x.RuleSystemNames ?? Array.Empty<string>()).Distinct().ToNoNullsArray(),
+                Applications = group.SelectMany(x => x.Applications ?? Array.Empty<string>()).Distinct().ToNoNullsArray(),
+                Profiles = group.SelectMany(x => x.Profiles ?? Array.Empty<FirewallProfiles>()).Distinct().ToNoNullsArray(),
+                Protocols = group.SelectMany(x => x.Protocols ?? Array.Empty<FirewallProtocol>()).Distinct().ToNoNullsArray(),
+                Scopes = group.SelectMany(x => x.Scopes ?? Array.Empty<FirewallScope>()).Distinct().ToNoNullsArray(),
+                ServiceNames = group.SelectMany(x => x.ServiceNames ?? Array.Empty<string>()).Distinct().ToNoNullsArray(),
+                Directions = group.SelectMany(x => x.Directions ?? Array.Empty<FirewallDirection>()).Distinct().ToNoNullsArray(),
+                IsDisabled = group.All(x => x.IsDisabled),
+                IsFullyEnabled = group.All(x => x.IsFullyEnabled),
+                Actions = group.SelectMany(x => x.Actions ?? Array.Empty<FirewallAction>()).Distinct().ToNoNullsArray(),
+                LocalPortTypes = group.SelectMany(x => x.LocalPortTypes ?? Array.Empty<FirewallPortType>()).Distinct().ToNoNullsArray(),
             };
         }
 
-        private static FirewallBlockedAddressInfo BuildBlockedAddressInfo(IFirewallRule firewallRule, IAddress address, WindowsFirewallAddressType addressType)
+        private static FirewallAddressInfo BuildBlockedAddressInfo(IFirewallRule firewallRule, IAddress address, WindowsFirewallAddressType addressType)
         {
-            return new FirewallBlockedAddressInfo
+            return new FirewallAddressInfo
             {
                 Address = address,
                 LocalPorts = firewallRule.LocalPorts,
@@ -110,6 +115,11 @@ namespace H.Win.CLI.BLL
                 Protocols = firewallRule.Protocol.AsArray(),
                 Scopes = firewallRule.Scope.AsArray(),
                 ServiceNames = firewallRule.ServiceName.AsArray(),
+                Directions = firewallRule.Direction.AsArray(),
+                IsDisabled = !firewallRule.IsEnable,
+                IsFullyEnabled = firewallRule.IsEnable,
+                Actions = firewallRule.Action.AsArray(),
+                LocalPortTypes = firewallRule.LocalPortType.AsArray(),
             };
         }
     }

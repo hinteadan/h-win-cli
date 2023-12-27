@@ -1,14 +1,10 @@
 ﻿using H.Necessaire;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WindowsFirewallHelper;
 
 namespace H.Win.CLI.BLL
 {
-    public class FirewallBlockedAddressInfo : IStringIdentity
+    public class FirewallAddressInfo : IStringIdentity
     {
         public string ID => Address?.ToString();
 
@@ -27,5 +23,12 @@ namespace H.Win.CLI.BLL
         public FirewallProfiles[] Profiles { get; set; }
         public FirewallProtocol[] Protocols { get; set; }
         public FirewallScope[] Scopes { get; set; }
+        public FirewallDirection[] Directions { get; set; }
+        public FirewallAction[] Actions { get; set; }
+        public FirewallPortType[] LocalPortTypes { get; set; }
+        public bool IsDisabled { get; set; }
+        public bool IsFullyEnabled { get; set; }
+        public bool IsPartiallyEnabled => !IsDisabled && !IsFullyEnabled;
+
     }
 }

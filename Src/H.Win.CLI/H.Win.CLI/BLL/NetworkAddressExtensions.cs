@@ -41,5 +41,7 @@ namespace H.Win.CLI.BLL
 
             return $"{root}.0{RangeSeparator}{root}.255";
         }
+
+        public static string[]
     }
 }

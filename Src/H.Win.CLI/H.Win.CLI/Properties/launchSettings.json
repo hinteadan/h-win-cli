@@ -12,6 +12,10 @@
       "commandName": "Project",
       "commandLineArgs": "windows-firewall all-blocked-ips out=\"currently-blocked-ips.txt\""
     },
+    "CLI - windows firewall block IPs": {
+      "commandName": "Project",
+      "commandLineArgs": "windows-firewall block-ips in=\"malicious-ip-ranges.txt\" rule-name=\"Blocked Malicious IPs\" overwrite-rule=true"
+    },
     "CLI - nugetversion - consolidate-deps": {
       "commandName": "Project",
       "commandLineArgs": "nugetversion consolidate-deps"

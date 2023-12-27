@@ -16,7 +16,7 @@ namespace H.Win.CLI.Commands
         static readonly string[] usageSyntaxes = new string[]
         {
             "newrelic-log-exports IPs src=\"StaticData\"",
-            "newrelic-log-exports IPs src=\"StaticData\" out=\"ips.txt\"",
+            "newrelic-log-exports IPs src=\"StaticData\" out=\"malicious-ip-ranges.txt\"",
         };
         protected override string[] GetUsageSyntaxes() => usageSyntaxes;
 

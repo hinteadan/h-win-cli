@@ -26,6 +26,8 @@ namespace H.Win.CLI.Commands
             if (args?.FirstOrDefault().ID.Is("IPs") == true)
                 return await AggregateAndPrintIPsFromNewRelicJsonExports(args?.Jump(1));
 
+            PrintUsageSyntax();
+
             return OperationResult.Win();
         }
 
@@ -59,7 +61,7 @@ namespace H.Win.CLI.Commands
                         await Console.Out.WriteAsync(".");
                         OperationResult<RawDataFileEntry[]> parseResult = rawJson.TryJsonToObject<RawDataFileEntry[]>();
                         await Console.Out.WriteAsync(".");
-                        parseResults[index] 
+                        parseResults[index]
                             = new FileParseResult
                             {
                                 File = file,

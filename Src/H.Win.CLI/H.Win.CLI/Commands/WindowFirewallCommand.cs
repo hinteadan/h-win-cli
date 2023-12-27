@@ -50,7 +50,7 @@ namespace H.Win.CLI.Commands
                         = firewall
                         .Rules
                         .Where(x => x.HasBlockingAddresses())
-                        .Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Outbound))
+                        .Where(rule => rule.IsEnable && rule.Direction.In(FirewallDirection.Inbound))
                         .SelectMany(rule => rule.AggregateBlockedAddressInfos() ?? Array.Empty<FirewallBlockedAddressInfo>())
                         .AggregateBulk()
                         ?.OrderBy(x => x.ID)

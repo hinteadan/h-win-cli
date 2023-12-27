@@ -4,6 +4,10 @@
       "commandName": "Project",
       "commandLineArgs": "debug"
     },
+    "CLI - newrelic json log exports aggregate IPs": {
+      "commandName": "Project",
+      "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" "
+    },
     "CLI - nugetversion - consolidate-deps": {
       "commandName": "Project",
       "commandLineArgs": "nugetversion consolidate-deps"

@@ -6,7 +6,7 @@
     },
     "CLI - newrelic json log exports aggregate IPs": {
       "commandName": "Project",
-      "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"ips.txt\""
+      "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"malicious-ip-ranges.txt\""
     },
     "CLI - windows firewall view all blocked IPs": {
       "commandName": "Project",

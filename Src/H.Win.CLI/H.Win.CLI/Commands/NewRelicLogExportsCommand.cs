@@ -1,6 +1,7 @@
 ﻿using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
 using H.Necessaire.Serialization;
+using H.Win.CLI.BLL;
 using System;
 using System.IO;
 using System.Linq;
@@ -77,20 +78,20 @@ namespace H.Win.CLI.Commands
                         return;
                     }
 
-                    string[] ips
+                    var ips
                         = parseResults
                         .SelectMany(x => x.ParseResult.Payload.Select(j => j.IPAddress))
-                        //.GroupBy(x => x.Substring(0, x.LastIndexOf(".")) + ".*")
-                        //.Select(x => new { IPGroup = x.Key, IPs = x.Select(x => x).Distinct().Order().ToArray(), Count = x.Count() })
-                        //.OrderByDescending(x => x.IPs.Length)
-                        //.ThenBy(x => x.IPGroup)
-                        .Distinct()
-                        .Order()
+                        .GroupBy(x => x.ToRange())
+                        .Select(x => new { IPGroup = x.Key, IPs = x.Select(x => x).Distinct().Order().ToArray(), Count = x.Count() })
+                        .OrderByDescending(x => x.IPs.Length)
+                        .ThenBy(x => x.IPGroup)
                         .ToArray()
                         ;
 
+                    string[] ipRanges = ips.Select(x => x.IPGroup).ToArray();
+
                     await Console.Out.WriteLineAsync();
-                    await Console.Out.WriteLineAsync(string.Join(Environment.NewLine, ips));
+                    await Console.Out.WriteLineAsync(string.Join(Environment.NewLine, ipRanges));
 
                     string outPath = args?.Get("out");
                     if (outPath.IsEmpty())
@@ -100,7 +101,7 @@ namespace H.Win.CLI.Commands
                     }
 
                     FileInfo outFile = new FileInfo(outPath);
-                    await File.WriteAllLinesAsync(outFile.FullName, ips);
+                    await File.WriteAllLinesAsync(outFile.FullName, ipRanges);
 
                     result = OperationResult.Win();
                 })

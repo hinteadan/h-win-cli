@@ -74,11 +74,7 @@ namespace H.Win.CLI.Commands
                         return Task.CompletedTask;
                     }
 
-                    //Parse in file
-                    IAddress[] addresses = new IAddress[] {
-                        new SingleIP(IPAddress.Parse("22.33.55.12")),
-                        new IPRange(IPAddress.Parse("26.33.55.0"), IPAddress.Parse("26.33.55.255")),
-                    };
+                    IAddress[] addresses = File.ReadAllLines(inFile.FullName).ParseAsFirewallAddresses();
 
                     bool canOverwrite = args?.Get("overwrite-rule")?.ParseToBoolOrFallbackTo(false).Value ?? false;
                     IFirewallRule existingRule = firewall.Rules?.SingleOrDefault(x => x.Name?.Is(ruleName) == true || x.FriendlyName?.Is(ruleName) == true);

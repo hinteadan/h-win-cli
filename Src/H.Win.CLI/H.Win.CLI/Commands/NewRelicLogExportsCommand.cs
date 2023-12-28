@@ -82,6 +82,7 @@ namespace H.Win.CLI.Commands
                         = parseResults
                         .SelectMany(x => x.ParseResult.Payload.Select(j => j.IPAddress))
                         .GroupBy(x => x.ToRange())
+                        .Where(x => !x.Key.IsEmpty())
                         .Select(x => new { IPGroup = x.Key, IPs = x.Select(x => x).Distinct().Order().ToArray(), Count = x.Count() })
                         .OrderByDescending(x => x.IPs.Length)
                         .ThenBy(x => x.IPGroup)

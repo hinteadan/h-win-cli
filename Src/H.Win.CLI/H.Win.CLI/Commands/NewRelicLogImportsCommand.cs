@@ -61,21 +61,31 @@ namespace H.Win.CLI.Commands
                         return;
                     }
 
-                    DirectoryInfo folder = new DirectoryInfo(outFolderPath);
-                    if (!folder.Exists)
-                        folder.Create();
+                    DirectoryInfo outFolder = new DirectoryInfo(outFolderPath);
+                    if (!outFolder.Exists)
+                        outFolder.Create();
 
                     OperationResult<RawLogsQueryResponse> newRelicLogsResult = await FetchLatestMaliciousIPsLogsFromNewRelic();
-                    if(!newRelicLogsResult.IsSuccessful)
+                    if (!newRelicLogsResult.IsSuccessful)
                     {
                         result = newRelicLogsResult;
                         return;
                     }
 
-                    string[] ips = newRelicLogsResult.Payload.Data?.Actor?.Account?.NRQL?.Results?.Select(x => x.IPAddress).ToNoNullsArray();
+                    string[] ips = newRelicLogsResult.Payload.Data?.Actor?.Account?.NRQL?.Results?.Select(x => x.IPAddress.NullIfEmpty()).Distinct().ToNoNullsArray();
 
+                    if (ips?.Any() != true)
+                    {
+                        result = OperationResult.Win();
+                        return;
+                    }
 
+                    RawDataFileEntry[] fileEntries = ips.Select(ip => new RawDataFileEntry { IPAddress = ip }).ToArray();
 
+                    string filePath = Path.Combine(outFolder.FullName, $"exportedLogRecords_{DateTime.UtcNow.ToString("yyyyMMdd_HHmmss")}.json");
+                    string fileContent = fileEntries.ToJsonArray(isPrettyPrinted: true);
+
+                    File.WriteAllText(filePath, fileContent);
                 })
                 .TryOrFailWithGrace(
                     onFail: ex => result = OperationResult.Fail(ex, $"Error occurred while trying to Aggregate And Export Latest Malicious IPs from NewRelic. Message: {ex.Message}")
@@ -124,9 +134,10 @@ namespace H.Win.CLI.Commands
 
                     using (HttpClient http = BuildNewHttpClient())
                     using (StringContent requestCotent = new StringContent(requestBodyString, Encoding.UTF8, "application/json"))
-                    using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{newRelicApiBaseUrl}/graphql").And(x => {
+                    using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{newRelicApiBaseUrl}/graphql").And(x =>
+                    {
                         x.Headers.Add("API-Key", newRelicUserApiKey);
-                        x.Content = requestCotent; 
+                        x.Content = requestCotent;
                     }))
                     using (HttpResponseMessage response = (await http.SendAsync(request, HttpCompletionOption.ResponseContentRead)))
                     {

@@ -66,6 +66,15 @@ namespace H.Win.CLI.Commands
                         folder.Create();
 
                     OperationResult<RawLogsQueryResponse> newRelicLogsResult = await FetchLatestMaliciousIPsLogsFromNewRelic();
+                    if(!newRelicLogsResult.IsSuccessful)
+                    {
+                        result = newRelicLogsResult;
+                        return;
+                    }
+
+                    string[] ips = newRelicLogsResult.Payload.Data?.Actor?.Account?.NRQL?.Results?.Select(x => x.IPAddress).ToNoNullsArray();
+
+
 
                 })
                 .TryOrFailWithGrace(

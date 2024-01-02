@@ -8,6 +8,10 @@
       "commandName": "Project",
       "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"malicious-ip-ranges.txt\""
     },
+    "CLI - newrelic json log imports malicious IPs": {
+      "commandName": "Project",
+      "commandLineArgs": "newrelic-log-imports malicious-ips out=\"StaticData\""
+    },
     "CLI - windows firewall view all blocked IPs": {
       "commandName": "Project",
       "commandLineArgs": "windows-firewall all-blocked-ips out=\"currently-blocked-ips.txt\""

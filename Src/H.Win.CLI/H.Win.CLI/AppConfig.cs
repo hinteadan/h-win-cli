@@ -18,12 +18,19 @@ namespace H.Win.CLI
                 {
                     Values = new[] {
                         "NuSpecRootFolderPath".ConfigWith(GetCodebaseFolderPath()),
+                        "NewRelic".ConfigWith(
+                            "AccountID".ConfigWith(ReadConfigFromFile("NewRelicAccountID.cfg.txt"))
+                            , "UserApiKey".ConfigWith(ReadConfigFromFile("NewRelicUserApiKey.cfg.txt"))
+                            , "NRQL".ConfigWith(
+                                "MaliciousLogs".ConfigWith(ReadConfigFromFile("NewRelicLogsNRQL.cfg.txt"))
+                            )
+                        ),
                     },
                 }));
             ;
         }
 
-        private static string ReadConnectionStringFromFile(string filePath)
+        private static string ReadConfigFromFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
 

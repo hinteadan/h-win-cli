@@ -398,3 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 **/*.data.json
 **/StaticData/**/*.*
+**/*.cfg.txt
+**/*.cfg.json

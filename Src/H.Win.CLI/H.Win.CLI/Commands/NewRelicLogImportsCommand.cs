@@ -1,10 +1,12 @@
 ﻿using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
+using H.Necessaire.Serialization;
 using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace H.Win.CLI.Commands
@@ -17,6 +19,21 @@ namespace H.Win.CLI.Commands
             "newrelic-log-imports malicious-ips out=\"StaticData\"",
         };
         protected override string[] GetUsageSyntaxes() => usageSyntaxes;
+
+        string newRelicApiBaseUrl = "https://api.eu.newrelic.com";
+        string newRelicAccountID;
+        string newRelicUserApiKey;
+        string newRelicMaliciousLogsNRQL;
+        public override void ReferDependencies(ImADependencyProvider dependencyProvider)
+        {
+            base.ReferDependencies(dependencyProvider);
+
+            RuntimeConfig runtimeConfig = dependencyProvider.GetRuntimeConfig();
+            ConfigNode newRelicConfig = runtimeConfig?.Get("NewRelic");
+            newRelicAccountID = newRelicConfig?.Get("AccountID")?.ToString();
+            newRelicUserApiKey = newRelicConfig?.Get("UserApiKey")?.ToString();
+            newRelicMaliciousLogsNRQL = newRelicConfig?.Get("NRQL")?.Get("MaliciousLogs")?.ToString();
+        }
 
         public override async Task<OperationResult> Run()
         {
@@ -65,7 +82,49 @@ namespace H.Win.CLI.Commands
             await
                 new Func<Task>(async () =>
                 {
-                    
+                    if (newRelicAccountID.IsEmpty())
+                    {
+                        result = OperationResult.Fail("New Relic AccountID from config is empty").WithoutPayload<RawLogsQueryResponse>();
+                        return;
+                    }
+
+                    if (newRelicUserApiKey.IsEmpty())
+                    {
+                        result = OperationResult.Fail("New Relic User API Key from config is empty").WithoutPayload<RawLogsQueryResponse>();
+                        return;
+                    }
+
+                    if (newRelicMaliciousLogsNRQL.IsEmpty())
+                    {
+                        result = OperationResult.Fail("New Relic Malicious Logs NRQL from config is empty").WithoutPayload<RawLogsQueryResponse>();
+                        return;
+                    }
+
+                    string requestBodyString = @$"{{
+  actor {{
+    account(id: {newRelicAccountID}) {{
+      nrql(
+        query: ""{newRelicMaliciousLogsNRQL}""
+      ) {{
+        results
+      }}
+    }}
+  }}
+}}
+";
+
+                    using (HttpClient http = BuildNewHttpClient())
+                    using (StringContent requestCotent = new StringContent(requestBodyString, Encoding.UTF8, "application/json"))
+                    using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{newRelicApiBaseUrl}/graphql").And(x => {
+                        x.Headers.Add("API-Key", newRelicUserApiKey);
+                        x.Content = requestCotent; 
+                    }))
+                    using (HttpResponseMessage response = (await http.SendAsync(request, HttpCompletionOption.ResponseContentRead)))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        string responseJsonString = await response.Content.ReadAsStringAsync();
+                        result = responseJsonString.TryJsonToObject<RawLogsQueryResponse>();
+                    }
 
                 })
                 .TryOrFailWithGrace(

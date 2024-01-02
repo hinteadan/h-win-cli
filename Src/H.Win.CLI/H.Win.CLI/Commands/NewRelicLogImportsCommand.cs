@@ -86,6 +86,8 @@ namespace H.Win.CLI.Commands
                     string fileContent = fileEntries.ToJsonArray(isPrettyPrinted: true);
 
                     File.WriteAllText(filePath, fileContent);
+
+                    result = OperationResult.Win();
                 })
                 .TryOrFailWithGrace(
                     onFail: ex => result = OperationResult.Fail(ex, $"Error occurred while trying to Aggregate And Export Latest Malicious IPs from NewRelic. Message: {ex.Message}")

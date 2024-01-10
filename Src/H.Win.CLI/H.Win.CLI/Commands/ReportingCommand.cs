@@ -89,7 +89,7 @@ namespace H.Win.CLI.Commands
 
                     foreach (string ipToDetail in ipsToDetail)
                     {
-                        DetailedIP detailedIP = await ipDetailsProvider.Detail(ipToDetail);
+                        DetailedIP detailedIP = await ipDetailsProvider.DetailIP(ipToDetail);
                         await Console.Out.WriteAsync(".");
                         if (detailedIP != null)
                             detailedIPs.Add(detailedIP);

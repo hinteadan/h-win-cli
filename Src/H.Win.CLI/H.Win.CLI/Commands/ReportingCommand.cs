@@ -16,6 +16,8 @@ namespace H.Win.CLI.Commands
         {
             "report malicious-ips src=\"FolderWithNewRelicIPLogs\"",
             "report malicious-ips src=\"FolderWithNewRelicIPLogs\" out=\"malicious-ips.txt\"",
+            "report ips-add-details src=\"malicious-ips.txt\" out=\"malicious-ips-with-details.csv\"",
+            "report ips-add-details src=\"malicious-ips.txt\" out=\"malicious-ips-with-details.csv\" force-refresh",
         };
         protected override string[] GetUsageSyntaxes() => usageSyntaxes;
 
@@ -26,9 +28,44 @@ namespace H.Win.CLI.Commands
             if (args?.FirstOrDefault().ID.Is("malicious-ips") == true)
                 return await AggregateAndPrintMaliciousIPsFromNewRelicJsonExports(args?.Jump(1));
 
+            if (args?.FirstOrDefault().ID.Is("ips-add-details") == true)
+                return await DecorateIPsWithDetails(args?.Jump(1));
+
             PrintUsageSyntax();
 
             return OperationResult.Win();
+        }
+
+        private async Task<OperationResult> DecorateIPsWithDetails(Note[] args)
+        {
+            OperationResult result = OperationResult.Fail("Not yet started");
+
+            await
+                new Func<Task>(async () =>
+                {
+                    string inPath = args?.Get("src");
+                    if (inPath.IsEmpty())
+                    {
+                        result = OperationResult.Fail("Input file path with IPs is required via the \"src\" arg");
+                        return;
+                    }
+                    FileInfo inFile = new FileInfo(inPath);
+                    if (!inFile.Exists)
+                    {
+                        result = OperationResult.Fail($"Input file path with IPs doesn't exist: {inFile.FullName}");
+                        return;
+                    }
+
+                    result = OperationResult.Win();
+                })
+                .TryOrFailWithGrace(
+                    onFail: ex =>
+                    {
+                        result = OperationResult.Fail(ex, $"Error occurred while trying to DecorateIPsWithDetails. Message: {ex.Message}");
+                    }
+                );
+
+            return result;
         }
 
         private async Task<OperationResult> AggregateAndPrintMaliciousIPsFromNewRelicJsonExports(Note[] args)
@@ -120,5 +157,7 @@ namespace H.Win.CLI.Commands
         {
             [DataMember(Name = "newrelic.IP")] public string IPAddress { get; set; }
         }
+
+        class 
     }
 }

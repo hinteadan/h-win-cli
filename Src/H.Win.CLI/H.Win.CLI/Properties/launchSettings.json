@@ -8,6 +8,14 @@
       "commandName": "Project",
       "commandLineArgs": "report malicious-ips src=\"C:\\H\\malicious-sources\\HackAttemptsIPs\" out=\"C:\\H\\malicious-sources\\malicious-ips.txt\""
     },
+    "CLI - report ips-add-details": {
+      "commandName": "Project",
+      "commandLineArgs": "report ips-add-details src=\"C:\\H\\malicious-sources\\malicious-ips.txt\" out=\"C:\\H\\malicious-sources\\malicious-ips-with-detils.csv\""
+    },
+    "CLI - report ips-add-details force-refresh": {
+      "commandName": "Project",
+      "commandLineArgs": "report ips-add-details src=\"C:\\H\\malicious-sources\\malicious-ips.txt\" out=\"C:\\H\\malicious-sources\\malicious-ips-with-detils.csv\" force-refresh"
+    },
     "CLI - newrelic json log exports aggregate IPs": {
       "commandName": "Project",
       "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"malicious-ip-ranges.txt\""

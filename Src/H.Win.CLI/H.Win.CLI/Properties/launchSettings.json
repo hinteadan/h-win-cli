@@ -4,6 +4,10 @@
       "commandName": "Project",
       "commandLineArgs": "debug"
     },
+    "CLI - report malicious-ips": {
+      "commandName": "Project",
+      "commandLineArgs": "report malicious-ips src=\"C:\\H\\malicious-sources\\HackAttemptsIPs\" out=\"C:\\H\\malicious-sources\\malicious-ips.txt\""
+    },
     "CLI - newrelic json log exports aggregate IPs": {
       "commandName": "Project",
       "commandLineArgs": "newrelic-log-exports IPs src=\"StaticData\" out=\"malicious-ip-ranges.txt\""

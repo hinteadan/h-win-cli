@@ -1,13 +1,10 @@
 ﻿using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
 using H.Necessaire.Serialization;
-using H.Win.CLI.BLL;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace H.Win.CLI.Commands
@@ -84,6 +81,7 @@ namespace H.Win.CLI.Commands
                         = parseResults
                         .SelectMany(x => x.ParseResult.Payload.Select(j => j.IPAddress))
                         .Where(x => !x.IsEmpty())
+                        .Distinct()
                         .Order()
                         .ToArray()
                         ;

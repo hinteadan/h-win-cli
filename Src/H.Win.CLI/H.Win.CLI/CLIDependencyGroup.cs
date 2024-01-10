@@ -9,6 +9,7 @@ namespace H.Win.CLI
         {
             dependencyRegistry
                 .Register<IFirewall>(() => FirewallManager.Instance)
+                .Register<BLL.DependencyGroup>(() => new BLL.DependencyGroup())
                 ;
         }
     }

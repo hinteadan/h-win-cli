@@ -1,7 +1,10 @@
 ﻿using H.Necessaire;
 using H.Necessaire.Runtime.CLI.Commands;
 using H.Necessaire.Serialization;
+using H.Win.CLI.BLL;
+using H.Win.CLI.Model;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -20,6 +23,13 @@ namespace H.Win.CLI.Commands
             "report ips-add-details src=\"malicious-ips.txt\" out=\"malicious-ips-with-details.csv\" force-refresh",
         };
         protected override string[] GetUsageSyntaxes() => usageSyntaxes;
+
+        IPDetailsProvider ipDetailsProvider;
+        public override void ReferDependencies(ImADependencyProvider dependencyProvider)
+        {
+            base.ReferDependencies(dependencyProvider);
+            ipDetailsProvider = dependencyProvider.Get<IPDetailsProvider>();
+        }
 
         public override async Task<OperationResult> Run()
         {
@@ -49,12 +59,51 @@ namespace H.Win.CLI.Commands
                         result = OperationResult.Fail("Input file path with IPs is required via the \"src\" arg");
                         return;
                     }
+                    string outPath = args?.Get("out");
+                    if (outPath.IsEmpty())
+                    {
+                        result = OperationResult.Fail("Output file path with detailed IPs is required via the \"out\" arg");
+                        return;
+                    }
                     FileInfo inFile = new FileInfo(inPath);
                     if (!inFile.Exists)
                     {
                         result = OperationResult.Fail($"Input file path with IPs doesn't exist: {inFile.FullName}");
                         return;
                     }
+                    FileInfo outFile = new FileInfo(outPath);
+
+                    string[] ips = File.ReadAllLines(inFile.FullName).Where(x => !x.IsEmpty()).ToArray();
+                    List<DetailedIP> detailedIPs = new List<DetailedIP>();
+
+                    bool isForcedRefresh = (args?.Any(x => x.ID == "force-refresh")) == true;
+                    if (!isForcedRefresh && outFile.Exists)
+                        detailedIPs.AddRange(ParseExistingDetailedIPs(outFile) ?? Enumerable.Empty<DetailedIP>());
+
+                    string[] ipsToDetail = ips;
+                    if (detailedIPs?.Any() == true)
+                    {
+                        string[] existingIPs = detailedIPs.Select(x => x.IP).ToArray();
+                        ipsToDetail = ipsToDetail.Except(existingIPs).ToArray();
+                    }
+
+                    foreach (string ipToDetail in ipsToDetail)
+                    {
+                        DetailedIP detailedIP = await ipDetailsProvider.Detail(ipToDetail);
+                        await Console.Out.WriteAsync(".");
+                        if (detailedIP != null)
+                            detailedIPs.Add(detailedIP);
+                    }
+                    await Console.Out.WriteLineAsync();
+
+                    await File.WriteAllLinesAsync(
+                        outFile.FullName,
+                        DetailedIP.CsvHeader.AsArray().Concat(
+                            detailedIPs.Select(x => x.ToCsvLine())
+                        )
+                        .Where(x => !x.IsEmpty())
+                        .ToArray()
+                    );
 
                     result = OperationResult.Win();
                 })
@@ -67,7 +116,6 @@ namespace H.Win.CLI.Commands
 
             return result;
         }
-
         private async Task<OperationResult> AggregateAndPrintMaliciousIPsFromNewRelicJsonExports(Note[] args)
         {
             OperationResult result = OperationResult.Fail("Not yet started");
@@ -146,6 +194,32 @@ namespace H.Win.CLI.Commands
         }
 
 
+        private DetailedIP[] ParseExistingDetailedIPs(FileInfo detailedIPsFile)
+        {
+            string[] csvLines = File.ReadAllLines(detailedIPsFile.FullName).Jump(1).Where(x => !x.IsEmpty()).ToArray();
+            DetailedIP[] result = csvLines.Select(ParseDetailedIPCsvLine).ToNoNullsArray();
+            return result;
+        }
+
+        private DetailedIP ParseDetailedIPCsvLine(string csvLine)
+        {
+            if (csvLine.IsEmpty())
+                return null;
+
+            DetailedIP result = null;
+
+            new Action(() =>
+            {
+                result = DetailedIP.FromCsvLine(csvLine);
+            })
+            .TryOrFailWithGrace(onFail: ex => result = null);
+
+            return result;
+        }
+
+
+
+
         class FileParseResult
         {
             public FileInfo File { get; set; }
@@ -157,7 +231,5 @@ namespace H.Win.CLI.Commands
         {
             [DataMember(Name = "newrelic.IP")] public string IPAddress { get; set; }
         }
-
-        class 
     }
 }

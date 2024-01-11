@@ -99,7 +99,7 @@ namespace H.Win.CLI.Commands
                     await File.WriteAllLinesAsync(
                         outFile.FullName,
                         DetailedIP.CsvHeader.AsArray().Concat(
-                            detailedIPs.Select(x => x.ToCsvLine())
+                            detailedIPs.OrderBy(x => x.IP).Select(x => x.ToCsvLine())
                         )
                         .Where(x => !x.IsEmpty())
                         .ToArray()

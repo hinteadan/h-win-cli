@@ -16,6 +16,9 @@ namespace H.Win.CLI.Commands
     internal class WindowFirewallCommand : CommandBase
     {
         #region Construct
+        static readonly string[] ignoredIPsPrefixes = [
+            "89.137."
+        ];
         static readonly string[] usageSyntaxes = new string[]
         {
             "windows-firewall all-blocked-ips out=\"currently-blocked-ips.txt\"",
@@ -75,6 +78,7 @@ namespace H.Win.CLI.Commands
                     }
 
                     IAddress[] addresses = File.ReadAllLines(inFile.FullName).ParseAsFirewallAddresses();
+                    addresses = addresses.Where(a => a.ToString().NotIn(ignoredIPsPrefixes, (ip, prefix) => ip.StartsWith(prefix))).ToArray();
 
                     bool canOverwrite = args?.Get("overwrite-rule")?.ParseToBoolOrFallbackTo(false).Value ?? false;
                     IFirewallRule existingRule = firewall.Rules?.SingleOrDefault(x => x.Name?.Is(ruleName) == true || x.FriendlyName?.Is(ruleName) == true);

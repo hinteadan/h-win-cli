@@ -17,7 +17,8 @@ namespace H.Win.CLI.Commands
     {
         #region Construct
         static readonly string[] ignoredIPsPrefixes = [
-            "89.137."
+            "89.137.",
+            "89.136."
         ];
         static readonly string[] usageSyntaxes = new string[]
         {
